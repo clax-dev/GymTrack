@@ -1,0 +1,55 @@
+// Modelo de datos de GymTrack (dbdiagram.io)
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table usuario {
+  id bigint [primary key, increment]
+  usuario varchar [not null, unique]
+  created_at timestamp
+}
+
+Table rutina {
+  id bigint [primary key, increment]
+  id_usuario bigint [not null]
+  nombre_rutina varchar [not null]
+  publica boolean [default: false]
+  created_at timestamp
+}
+
+Table ejercicio {
+  id bigint [primary key, increment]
+  id_rutina bigint [not null]
+  nombre varchar [not null]
+  repeticiones int [not null]
+  series int [not null]
+}
+
+Enum estado_sesion {
+  PENDIENTE
+  REALIZADO
+}
+
+Table sesion {
+  id bigint [primary key, increment]
+  id_rutina bigint [not null]
+  estado estado_sesion [not null, default: 'PENDIENTE']
+  created_at timestamp
+}
+
+Table registro {
+  id bigint [primary key, increment]
+  id_sesion bigint [not null]
+  id_ejercicio bigint [not null]
+  numero_serie int [not null]
+  peso decimal(6,2) [not null]
+  repeticiones_realizadas int [not null]
+
+  indexes {
+    (id_sesion, id_ejercicio, numero_serie) [unique]
+  }
+}
+
+Ref: rutina.id_usuario > usuario.id
+Ref: ejercicio.id_rutina > rutina.id
+Ref: sesion.id_rutina > rutina.id
+Ref: registro.id_sesion > sesion.id
+Ref: registro.id_ejercicio > ejercicio.id
